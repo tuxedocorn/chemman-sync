@@ -250,6 +250,8 @@ def main():
     for i in range(0, len(new_rows), batch_size):
         batch = new_rows[i:i + batch_size]
         payload = {"toBottom": True, "rows": batch}
+        import json
+        print(f"  Sending payload: {json.dumps(payload)[:500]}")
         resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=payload)
         resp.raise_for_status()
         print(f"  API response: {resp.json()}")
