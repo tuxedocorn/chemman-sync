@@ -86,10 +86,8 @@ def get_chemman_csv():
     resp = session.post(LOGIN_URL, data=login_payload)
     resp.raise_for_status()
     result = resp.json()
-    if not result.get("success") and result.get("result") != "success":
-        # Some versions return {"result":"success"}, others {"success":true}
-        if "error" in str(result).lower():
-            raise Exception(f"Chem-Man login failed: {result}")
+    if not result.get("valid") and not result.get("success") and result.get("result") != "success":
+        raise Exception(f"Chem-Man login failed: {result}")
     print("✓ Chem-Man auth successful")
 
     # Build date range
