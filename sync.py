@@ -243,6 +243,7 @@ def main():
         payload = {"toBottom": True, "rows": batch}
         resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=payload)
         resp.raise_for_status()
+        print(f"  API response: {resp.json()}")
         inserted += len(batch)
         print(f"  Inserted batch {i // batch_size + 1}: {inserted}/{len(new_rows)} rows")
 
