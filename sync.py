@@ -152,6 +152,7 @@ def get_or_create_sheet():
         if sheet["name"] == SHEET_NAME:
             sheet_id = sheet["id"]
             print(f"✓ Found existing sheet: '{SHEET_NAME}' (id={sheet_id})")
+            time.sleep(2)
             return sheet_id, get_column_id_map(sheet_id)
 
     payload = {"name": SHEET_NAME, "columns": COLUMN_DEFS}
@@ -166,8 +167,13 @@ def get_or_create_sheet():
 def get_column_id_map(sheet_id):
     """Return {column_title: column_id} for the sheet."""
     resp = requests.get(f"{SS_BASE}/sheets/{sheet_id}", headers=SS_HEADERS)
-    resp.raise_for_status()
-    return {col["title"]: col["id"] for col in resp.json()["columns"]}
+    if not resp.ok:
+        print(f"  ERROR fetching sheet {sheet_id}: {resp.status_code} {resp.text}")
+        resp.raise_for_status()
+    data = resp.json()
+    if "columns" not in data:
+        raise Exception(f"No columns in sheet response: {data}")
+    return {col["title"]: col["id"] for col in data["columns"]}
 
 
 def get_existing_dedup_keys(sheet_id, dedup_col_id):
