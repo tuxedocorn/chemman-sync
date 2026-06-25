@@ -168,6 +168,13 @@ def get_or_create_sheet():
     sheet_id = resp.json()["result"]["id"]
     print(f"✓ Created new sheet: '{SHEET_NAME}' (id={sheet_id})")
     time.sleep(5)
+    # Smartsheet auto-creates a blank row 1 on new sheets — delete it
+    sheet_data = requests.get(f"{SS_BASE}/sheets/{sheet_id}", headers=SS_HEADERS).json()
+    blank_rows = [r["id"] for r in sheet_data.get("rows", []) if not any(c.get("value") for c in r.get("cells", []))]
+    if blank_rows:
+        requests.delete(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, params={"ids": ",".join(str(r) for r in blank_rows)})
+        print(f"✓ Deleted {len(blank_rows)} auto-created blank row(s)")
+        time.sleep(2)
     return sheet_id, get_column_id_map(sheet_id)
 
 
