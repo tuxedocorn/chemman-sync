@@ -244,19 +244,20 @@ def main():
         print("Nothing to do — Smartsheet is up to date.")
         return
 
-    # Insert in batches of 500 (Smartsheet API limit)
-    batch_size = 500
+    # Insert rows one at a time to avoid sibling/parent issues
     inserted = 0
-    for i in range(0, len(new_rows), batch_size):
-        batch = new_rows[i:i + batch_size]
-        payload = {"rows": batch}
-        import json
-        print(f"  Sending payload: {json.dumps(payload)[:500]}")
-        resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=payload)
+    for row in new_rows:
+        resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json={"rows": [row]})
         resp.raise_for_status()
-        print(f"  API response: {resp.json()}")
-        inserted += len(batch)
-        print(f"  Inserted batch {i // batch_size + 1}: {inserted}/{len(new_rows)} rows")
+        result = resp.json()
+        row_num = result.get("result", {}).get("rowNumber")
+        sibling = result.get("result", {}).get("siblingId")
+        if sibling:
+            print(f"  WARNING: row {row_num} has siblingId {sibling} — may be nested!")
+        inserted += 1
+        if inserted % 10 == 0:
+            print(f"  Inserted {inserted}/{len(new_rows)} rows")
+    print(f"  Inserted all {inserted} rows")
 
     print(f"\n✓ Done! {inserted} new rows added to '{SHEET_NAME}'")
 
