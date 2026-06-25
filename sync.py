@@ -251,20 +251,12 @@ def main():
         print("Nothing to do — Smartsheet is up to date.")
         return
 
-    # Insert rows one at a time to avoid sibling/parent issues
-    inserted = 0
-    for row in new_rows:
-        resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json={"rows": [row]})
+    # Insert in batches of 500
+    for i in range(0, len(new_rows), 500):
+        batch = new_rows[i:i + 500]
+        resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=batch)
         resp.raise_for_status()
-        result = resp.json()
-        row_num = result.get("result", {}).get("rowNumber")
-        sibling = result.get("result", {}).get("siblingId")
-        if sibling:
-            print(f"  WARNING: row {row_num} has siblingId {sibling} — may be nested!")
-        inserted += 1
-        if inserted % 10 == 0:
-            print(f"  Inserted {inserted}/{len(new_rows)} rows")
-    print(f"  Inserted all {inserted} rows")
+    print(f"  Inserted all {len(new_rows)} rows")
 
     print(f"\n✓ Done! {inserted} new rows added to '{SHEET_NAME}'")
 
