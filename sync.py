@@ -226,9 +226,6 @@ def main():
             col_id = col_id_map.get(ss_col) or col_id_map.get(ss_col.strip())
             if col_id and value:
                 cells.append({"columnId": col_id, "value": value, "strict": False})
-        # Debug: print first row's cells
-        if not new_rows:
-
         # Add dedup key
         cells.append({"columnId": dedup_col_id, "value": key})
 
