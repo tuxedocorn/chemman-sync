@@ -133,6 +133,9 @@ def get_chemman_csv():
     reader = csv.DictReader(io.StringIO(resp.text), delimiter='\t')
     rows = list(reader)
     print(f"✓ Fetched {len(rows)} rows from Chem-Man ({date_from.strftime(fmt)} → {date_to.strftime(fmt)})")
+    if rows:
+        print(f"  First row keys: {list(rows[0].keys())[:6]}")
+        print(f"  First row sample: {dict(list(rows[0].items())[:6])}")
     return rows
 
 
