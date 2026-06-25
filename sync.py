@@ -130,8 +130,10 @@ def get_chemman_csv():
     resp.raise_for_status()
 
     # Parse CSV
-    reader = csv.DictReader(io.StringIO(resp.text), delimiter='\t')
+    reader = csv.DictReader(io.StringIO(resp.text))
     rows = list(reader)
+    # Strip surrounding quotes from keys (Chem-Man wraps some headers in quotes)
+    rows = [{k.strip().strip('"'): v for k, v in row.items()} for row in rows]
     print(f"✓ Fetched {len(rows)} rows from Chem-Man ({date_from.strftime(fmt)} → {date_to.strftime(fmt)})")
     if rows:
         print(f"  First row keys: {list(rows[0].keys())[:6]}")
