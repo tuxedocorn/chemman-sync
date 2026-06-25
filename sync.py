@@ -233,7 +233,7 @@ def main():
         cells.append({"columnId": dedup_col_id, "value": key})
 
         if cells:
-            new_rows.append({"cells": cells})
+            new_rows.append({"toBottom": True, "cells": cells})
             existing_keys.add(key)  # prevent dupes within this batch
 
     print(f"✓ {len(new_rows)} new rows to insert, {skipped} already exist")
@@ -249,7 +249,7 @@ def main():
     inserted = 0
     for i in range(0, len(new_rows), batch_size):
         batch = new_rows[i:i + batch_size]
-        payload = {"toBottom": True, "rows": batch}
+        payload = {"rows": batch}
         import json
         print(f"  Sending payload: {json.dumps(payload)[:500]}")
         resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=payload)
