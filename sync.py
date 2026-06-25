@@ -153,7 +153,9 @@ def get_or_create_sheet():
     """Find or create the target sheet, return (sheet_id, column_map)."""
     resp = requests.get(f"{SS_BASE}/sheets", headers=SS_HEADERS)
     resp.raise_for_status()
-    for sheet in resp.json().get("data", []):
+    all_sheets = resp.json().get("data", [])
+    print(f"  All sheets visible to token: {[(s['name'], s['id']) for s in all_sheets]}")
+    for sheet in all_sheets:
         if sheet["name"] == SHEET_NAME:
             sheet_id = sheet["id"]
             print(f"✓ Found existing sheet: '{SHEET_NAME}' (id={sheet_id})")
