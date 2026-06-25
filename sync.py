@@ -206,6 +206,7 @@ def main():
 
     for row in csv_rows:
         key = build_dedup_key(row)
+        print(f"  Dedup key: '{key}'")
         if key in existing_keys:
             skipped += 1
             continue
