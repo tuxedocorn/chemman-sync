@@ -136,8 +136,6 @@ def get_chemman_csv():
     rows = [{k.strip().strip('"'): v for k, v in row.items()} for row in rows]
     print(f"✓ Fetched {len(rows)} rows from Chem-Man ({date_from.strftime(fmt)} → {date_to.strftime(fmt)})")
     if rows:
-        print(f"  First row keys: {list(rows[0].keys())[:6]}")
-        print(f"  First row sample: {dict(list(rows[0].items())[:6])}")
     return rows
 
 
@@ -154,7 +152,6 @@ def get_or_create_sheet():
     resp = requests.get(f"{SS_BASE}/sheets", headers=SS_HEADERS)
     resp.raise_for_status()
     all_sheets = resp.json().get("data", [])
-    print(f"  All sheets visible to token: {[(s['name'], s['id']) for s in all_sheets]}")
     for sheet in all_sheets:
         if sheet["name"] == SHEET_NAME:
             sheet_id = sheet["id"]
@@ -182,7 +179,6 @@ def get_column_id_map(sheet_id):
     """Return {column_title: column_id} for the sheet."""
     resp = requests.get(f"{SS_BASE}/sheets/{sheet_id}", headers=SS_HEADERS)
     if not resp.ok:
-        print(f"  ERROR fetching sheet {sheet_id}: {resp.status_code} {resp.text}")
         resp.raise_for_status()
     data = resp.json()
     if "columns" not in data:
@@ -220,7 +216,6 @@ def main():
 
     for row in csv_rows:
         key = build_dedup_key(row)
-        print(f"  Dedup key: '{key}'")
         if key in existing_keys:
             skipped += 1
             continue
@@ -234,7 +229,6 @@ def main():
                 cells.append({"columnId": col_id, "value": value, "strict": False})
         # Debug: print first row's cells
         if not new_rows:
-            print(f"  First row ALL cells: {cells}")
 
         # Add dedup key
         cells.append({"columnId": dedup_col_id, "value": key})
@@ -246,7 +240,6 @@ def main():
     print(f"✓ {len(new_rows)} new rows to insert, {skipped} already exist")
 
     if new_rows:
-        print(f"  Sample row cells: {new_rows[0]['cells'][:3]}")
     if not new_rows:
         print("Nothing to do — Smartsheet is up to date.")
         return
@@ -258,7 +251,7 @@ def main():
         resp.raise_for_status()
     print(f"  Inserted all {len(new_rows)} rows")
 
-    print(f"\n✓ Done! {inserted} new rows added to '{SHEET_NAME}'")
+    print(f"\n✓ Done! {len(new_rows)} new rows added to '{SHEET_NAME}'")
 
 
 if __name__ == "__main__":
