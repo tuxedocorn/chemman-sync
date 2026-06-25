@@ -167,7 +167,7 @@ def get_or_create_sheet():
     resp.raise_for_status()
     sheet_id = resp.json()["result"]["id"]
     print(f"✓ Created new sheet: '{SHEET_NAME}' (id={sheet_id})")
-    time.sleep(2)
+    time.sleep(5)
     return sheet_id, get_column_id_map(sheet_id)
 
 
