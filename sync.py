@@ -35,34 +35,41 @@ SS_HEADERS = {
 
 # ── Columns to pull from CSV (CSV header → Smartsheet column name) ────────────
 COLUMN_MAP = {
-    "Load Nbr":                             "Load Nbr",
-    "Transaction Date":                     "Transaction Date",
-    "Location":                             "Location ID",
-    "Location Description":                 "Location Description",
-    "Location Applied Acres":               "Applied Acres",
-    "Location Crop":                        "Crop",
-    "Chemical / Charge Nickname":           "Chemical Nickname",
-    "Chemical / Charge Description":        "Chemical Description",
-    "Chemical / Charge Applied Rate":       "Applied Rate",
-    "Chemical / Charge Applied Unit":       "Applied Unit",
-    "Chemical / Charge Total Applied":      "Total Applied",
+    "Load Nbr":                                      "Load Nbr",
+    "Transaction Date":                              "Transaction Date",
+    "Location/Site Nbr":                             "Site Nbr",
+    "Location Description":                          "Location Description",
+    "Location Applied Acres":                        "Applied Acres",
+    "Location Latitude/Longitude":                   "Lat/Long",
+    "Location Pest":                                 "Location Pest",
+    "Location Crop":                                 "Crop",
+    "Chemical / Charge Nickname":                    "Chemical Nickname",
+    "Chemical / Charge Description":                 "Chemical Description",
+    "Chemical / Charge EPA #":                       "EPA #",
+    "Chemical / Charge Applied Rate":                "Applied Rate",
+    "Chemical / Charge Applied Unit":                "Applied Unit",
+    "Chemical / Charge Total Applied":               "Total Applied",
     "Chemical / Charge Total Applied in Base Units": "Total Applied (Base)",
     "Chemical / Charge Total Applied Base Unit":     "Total Applied Base Unit",
-    "Applicator First Name":                "Applicator First",
-    "Applicator Last Name":                 "Applicator Last",
-    "Applicator Vehicle Description":       "Vehicle",
-    "Application Date":                     "Application Date",
-    "Application Start Time":               "Start Time",
-    "Application End Time":                 "End Time",
-    "Temperature Start":                    "Temp Start",
-    "Temperature End":                      "Temp End",
-    "Wind MPH Start":                       "Wind MPH Start",
-    "Wind MPH End":                         "Wind MPH End",
-    "Wind Direction Start":                 "Wind Dir Start",
-    "Wind Direction End":                   "Wind Dir End",
-    "Humidity Start":                       "Humidity Start",
-    "Humidity End":                         "Humidity End",
-    "Status":                               "Status",
+    "Chemical / Charge Pest":                        "Chemical Pest",
+    "Chemical / Charge Cost Per":                    "Cost Per",
+    "Chemical / Charge Cost Unit":                   "Cost Unit",
+    "Applicator First Name":                         "Applicator First",
+    "Applicator Last Name":                          "Applicator Last",
+    "Applicator Vehicle ID":                         "Vehicle ID",
+    "Applicator Vehicle Description":                "Vehicle",
+    "Application Date":                              "Application Date",
+    "Application Start Time":                        "Start Time",
+    "Application End Time":                          "End Time",
+    "Temperature Start":                             "Temp Start",
+    "Temperature End":                               "Temp End",
+    "Wind MPH Start":                                "Wind MPH Start",
+    "Wind MPH End":                                  "Wind MPH End",
+    "Wind Direction Start":                          "Wind Dir Start",
+    "Wind Direction End":                            "Wind Dir End",
+    "Humidity Start":                                "Humidity Start",
+    "Humidity End":                                  "Humidity End",
+    "Status":                                        "Status",
 }
 
 DEDUP_COL = "Dedup Key"
@@ -140,9 +147,9 @@ def get_chemman_csv():
 
 def build_dedup_key(row):
     load   = row.get("Load Nbr", "").strip()
-    loc    = row.get("Location", "").strip()
+    site   = row.get("Location/Site Nbr", "").strip()
     chem   = row.get("Chemical / Charge Nickname", "").strip()
-    return f"{load}|{loc}|{chem}"
+    return f"{load}|{site}|{chem}"
 
 
 # ── Smartsheet Helpers ────────────────────────────────────────────────────────
