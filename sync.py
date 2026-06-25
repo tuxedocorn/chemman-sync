@@ -67,7 +67,8 @@ COLUMN_MAP = {
 
 DEDUP_COL = "Dedup Key"
 
-COLUMN_DEFS = [{"title": name, "type": "TEXT_NUMBER"} for name in COLUMN_MAP.values()]
+COLUMN_DEFS = [{"title": name, "type": "TEXT_NUMBER", "primary": False} for name in COLUMN_MAP.values()]
+COLUMN_DEFS[0]["primary"] = True
 COLUMN_DEFS.append({"title": DEDUP_COL, "type": "TEXT_NUMBER"})
 
 
