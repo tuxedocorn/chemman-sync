@@ -219,14 +219,19 @@ def main():
         cells = []
         for csv_col, ss_col in COLUMN_MAP.items():
             value = row.get(csv_col, "").strip()
-            if value and ss_col in col_id_map:
-                cells.append({"columnId": col_id_map[ss_col], "value": value})
+            # Find column ID with whitespace-tolerant lookup
+            col_id = col_id_map.get(ss_col) or col_id_map.get(ss_col.strip())
+            if col_id and value:
+                cells.append({"columnId": col_id, "value": value})
+        # Debug: print first row's cells
+        if not new_rows:
+            print(f"  First row cells being sent: {cells[:4]}")
 
         # Add dedup key
         cells.append({"columnId": dedup_col_id, "value": key})
 
         if cells:
-            new_rows.append({"cells": cells})
+            new_rows.append({"toBottom": True, "cells": cells})
             existing_keys.add(key)  # prevent dupes within this batch
 
     print(f"✓ {len(new_rows)} new rows to insert, {skipped} already exist")
@@ -242,7 +247,7 @@ def main():
     inserted = 0
     for i in range(0, len(new_rows), batch_size):
         batch = new_rows[i:i + batch_size]
-        payload = {"toBottom": True, "rows": batch}
+        payload = {"rows": batch}
         resp = requests.post(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, json=payload)
         resp.raise_for_status()
         print(f"  API response: {resp.json()}")
