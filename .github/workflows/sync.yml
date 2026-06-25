@@ -1,0 +1,27 @@
+name: Chem-Man Sync
+
+on:
+  schedule:
+    - cron: '0 13 * * *'   # Daily at 7am Mountain Time
+  workflow_dispatch:        # Allow manual runs from GitHub Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-dotenv
+
+      - name: Run sync
+        env:
+          CHEMMAN_STORE:    ${{ secrets.CHEMMAN_STORE }}
+          CHEMMAN_USER:     ${{ secrets.CHEMMAN_USER }}
+          CHEMMAN_PASS:     ${{ secrets.CHEMMAN_PASS }}
+          SMARTSHEET_TOKEN: ${{ secrets.SMARTSHEET_TOKEN }}
+        run: python sync.py
