@@ -130,7 +130,7 @@ def get_chemman_csv():
     resp.raise_for_status()
 
     # Parse CSV
-    reader = csv.DictReader(io.StringIO(resp.text))
+    reader = csv.DictReader(io.StringIO(resp.text), delimiter='\t')
     rows = list(reader)
     print(f"✓ Fetched {len(rows)} rows from Chem-Man ({date_from.strftime(fmt)} → {date_to.strftime(fmt)})")
     return rows
