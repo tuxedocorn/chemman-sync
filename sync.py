@@ -135,7 +135,6 @@ def get_chemman_csv():
     # Strip surrounding quotes from keys (Chem-Man wraps some headers in quotes)
     rows = [{k.strip().strip('"'): v for k, v in row.items()} for row in rows]
     print(f"✓ Fetched {len(rows)} rows from Chem-Man ({date_from.strftime(fmt)} → {date_to.strftime(fmt)})")
-    if rows:
     return rows
 
 
