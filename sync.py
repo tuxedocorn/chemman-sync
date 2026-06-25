@@ -235,7 +235,6 @@ def main():
 
     print(f"✓ {len(new_rows)} new rows to insert, {skipped} already exist")
 
-    if new_rows:
     if not new_rows:
         print("Nothing to do — Smartsheet is up to date.")
         return
