@@ -2,7 +2,9 @@ name: Chem-Man Sync
 
 on:
   schedule:
-    - cron: '0 13 * * *'   # Daily at 7am Mountain Time
+    - cron: "0 11 * * *"   # 5:00 AM MDT (UTC-6)
+    - cron: "0 16 * * *"   # 10:00 AM MDT (UTC-6)
+    - cron: "0 22 * * *"   # 4:00 PM MDT (UTC-6)
   workflow_dispatch:        # Allow manual runs from GitHub Actions tab
 
 jobs:
