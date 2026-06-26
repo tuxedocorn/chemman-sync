@@ -21,7 +21,8 @@ CHEMMAN_USER    = os.getenv("CHEMMAN_USER")         # rizedrone
 CHEMMAN_PASS    = os.getenv("CHEMMAN_PASS")
 
 SMARTSHEET_TOKEN = os.getenv("SMARTSHEET_TOKEN")
-SHEET_NAME       = "2026 Chem-Man Github Import"
+SHEET_NAME       = "2026 Rize Chem Man Imports"
+SHEET_ID         = 4884496338866052  # Hardcoded — point directly at existing sheet
 
 CHEMMAN_BASE  = "https://login.chem-man.com"
 LOGIN_URL     = f"{CHEMMAN_BASE}/xhr/StoreUser.xhrLogin"
@@ -34,41 +35,35 @@ SS_HEADERS = {
 }
 
 # ── Columns to pull from CSV (CSV header → Smartsheet column name) ────────────
+# Column names match the existing 2026 Rize Chem Man Imports sheet exactly
 COLUMN_MAP = {
     "Load Nbr":                                      "Load Nbr",
-    "Transaction Date":                              "Transaction Date",
-    "Location/Site Nbr":                             "Site Nbr",
-    "Location Description":                          "Location Description",
-    "Location Applied Acres":                        "Applied Acres",
-    "Location Latitude/Longitude":                   "Lat/Long",
+    "Location/Site Nbr":                             "Location Site Nbr",
+    "Location Applied Acres":                        "Location Applied Acres",
+    "Location Latitude/Longitude":                   "Event Latitude and Longitude",
     "Location Pest":                                 "Location Pest",
-    "Location Crop":                                 "Crop",
-    "Chemical / Charge Nickname":                    "Chemical Nickname",
-    "Chemical / Charge Description":                 "Chemical Description",
-    "Chemical / Charge EPA #":                       "EPA #",
-    "Chemical / Charge Applied Rate":                "Applied Rate",
-    "Chemical / Charge Applied Unit":                "Applied Unit",
-    "Chemical / Charge Total Applied":               "Total Applied",
-    "Chemical / Charge Total Applied in Base Units": "Total Applied (Base)",
-    "Chemical / Charge Total Applied Base Unit":     "Total Applied Base Unit",
-    "Chemical / Charge Pest":                        "Chemical Pest",
-    "Chemical / Charge Cost Per":                    "Cost Per",
-    "Chemical / Charge Cost Unit":                   "Cost Unit",
-    "Applicator First Name":                         "Applicator First",
-    "Applicator Last Name":                          "Applicator Last",
-    "Applicator Vehicle ID":                         "Vehicle ID",
-    "Applicator Vehicle Description":                "Vehicle",
+    "Location Crop":                                 "Location Crop",
+    "Chemical / Charge Nickname":                    "Chemical / Charge Nickname",
+    "Chemical / Charge Description":                 "Chemical / Charge Description",
+    "Chemical / Charge EPA #":                       "Chemical / Charge EPA #",
+    "Chemical / Charge Applied Rate":                "Chemical / Charge Applied Rate",
+    "Chemical / Charge Applied Unit":                "Chemical / Charge Applied Unit",
+    "Chemical / Charge Total Applied":               "Chemical / Charge Total Applied",
+    "Chemical / Charge Total Applied in Base Units": "Chemical / Charge Total Applied in Base Units",
+    "Chemical / Charge Total Applied Base Unit":     "Chemical / Charge Total Applied Base Unit",
+    "Chemical / Charge Pest":                        "Chemical / Charge Pest",
+    "Chemical / Charge Cost Unit":                   "Chemical / Charge Cost Unit",
+    "Applicator First Name":                         "Applicator First Name",
+    "Applicator Last Name":                          "Applicator Last Name",
+    "Applicator Vehicle ID":                         "Applicator Vehicle ID",
+    "Applicator Vehicle Description":                "Applicator Vehicle Description",
     "Application Date":                              "Application Date",
-    "Application Start Time":                        "Start Time",
-    "Application End Time":                          "End Time",
-    "Temperature Start":                             "Temp Start",
-    "Temperature End":                               "Temp End",
+    "Application Start Time":                        "Start Time Imported",
+    "Application End Time":                          "End Time Imported",
+    "Temperature Start":                             "Temperature Start",
+    "Temperature End":                               "Temperature End",
     "Wind MPH Start":                                "Wind MPH Start",
     "Wind MPH End":                                  "Wind MPH End",
-    "Wind Direction Start":                          "Wind Dir Start",
-    "Wind Direction End":                            "Wind Dir End",
-    "Humidity Start":                                "Humidity Start",
-    "Humidity End":                                  "Humidity End",
     "Status":                                        "Status",
 }
 
@@ -154,31 +149,9 @@ def build_dedup_key(row):
 
 # ── Smartsheet Helpers ────────────────────────────────────────────────────────
 def get_or_create_sheet():
-    """Find or create the target sheet, return (sheet_id, column_map)."""
-    resp = requests.get(f"{SS_BASE}/sheets", headers=SS_HEADERS)
-    resp.raise_for_status()
-    all_sheets = resp.json().get("data", [])
-    for sheet in all_sheets:
-        if sheet["name"] == SHEET_NAME:
-            sheet_id = sheet["id"]
-            print(f"✓ Found existing sheet: '{SHEET_NAME}' (id={sheet_id})")
-            time.sleep(2)
-            return sheet_id, get_column_id_map(sheet_id)
-
-    payload = {"name": SHEET_NAME, "columns": COLUMN_DEFS}
-    resp = requests.post(f"{SS_BASE}/sheets", headers=SS_HEADERS, json=payload)
-    resp.raise_for_status()
-    sheet_id = resp.json()["result"]["id"]
-    print(f"✓ Created new sheet: '{SHEET_NAME}' (id={sheet_id})")
-    time.sleep(5)
-    # Smartsheet auto-creates a blank row 1 on new sheets — delete it
-    sheet_data = requests.get(f"{SS_BASE}/sheets/{sheet_id}", headers=SS_HEADERS).json()
-    blank_rows = [r["id"] for r in sheet_data.get("rows", []) if not any(c.get("value") for c in r.get("cells", []))]
-    if blank_rows:
-        requests.delete(f"{SS_BASE}/sheets/{sheet_id}/rows", headers=SS_HEADERS, params={"ids": ",".join(str(r) for r in blank_rows)})
-        print(f"✓ Deleted {len(blank_rows)} auto-created blank row(s)")
-        time.sleep(2)
-    return sheet_id, get_column_id_map(sheet_id)
+    """Use the hardcoded sheet ID directly."""
+    print(f"✓ Using sheet: '{SHEET_NAME}' (id={SHEET_ID})")
+    return SHEET_ID, get_column_id_map(SHEET_ID)
 
 
 def get_column_id_map(sheet_id):
